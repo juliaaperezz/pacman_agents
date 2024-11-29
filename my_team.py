@@ -53,7 +53,7 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
         actions = game_state.get_legal_actions(self.index)
         enemies = [game_state.get_agent_state(i) for i in self.get_opponents(game_state)]
         invaders = [a for a in enemies if a.is_pacman and a.get_position() is not None]
-        my_pos = successor.get_agent_state(self.index).get_position()
+        
         #evaluate all actions and choose the best one
         values = [self.evaluate(game_state, a) for a in actions]
         max_value = max(values)
@@ -107,6 +107,7 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
         agent_state = game_state.get_agent_state(self.index)
         #if there are only a few food left or the threshold is met, head back to start 
         food_left = len(self.get_food(game_state).as_list())
+        my_pos = successor.get_agent_state(self.index).get_position()
         min_distance = min([self.get_maze_distance(my_pos, food) for food in self.get_food(game_state).as_list()])
         if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD and not min_distance <= 3:
             best_dist = 9999
@@ -705,7 +706,9 @@ class DefensiveReflexAgent(CaptureAgent): #not used, but it was a try
         else:
             nearest_ghost_distance = float('inf')
         agent_state = game_state.get_agent_state(self.index)
-        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD or (len(ghosts) > 0 and nearest_ghost_distance <= ghost_distance_threshold) and not agent_state.is_pacman:
+        my_pos = successor.get_agent_state(self.index).get_position()
+        min_distance = min([self.get_maze_distance(my_pos, food) for food in self.get_food(game_state).as_list()])
+        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD or (len(ghosts) > 0 and nearest_ghost_distance <= ghost_distance_threshold) and not agent_state.is_pacman and not min_distance <= 3:
             print("run away")
             best_dist = 9999
             best_action = None
