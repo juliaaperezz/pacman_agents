@@ -609,7 +609,7 @@ class HybridReflexAgent3(CaptureAgent): #Other pacman
             distance_to_food = -3
             successor_score = 100
             distance_to_ghost = -6
-        elif food_left < 16:   we don't know why but this gives an error, we wanted to put it in "defense mode" if the condition was met
+        elif food_left < 16:   #we don't know why but this gives an error, we wanted to put it in "defense mode" if the condition was met
             #print("ondefenseduty")
             num_invaders = -1000 
             on_defense = -100
