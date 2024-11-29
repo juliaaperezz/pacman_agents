@@ -42,52 +42,13 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
         self.food_collected = 0  #initialize food collected counter
         CaptureAgent.register_initial_state(self, game_state)
     
-    def is_scared(self, game_state):
-        """
-        Check if the agent is scared.
-        """
-        return game_state.get_agent_state(self.index).scared_timer > 0
 
-    def get_nearest_ghost(self, game_state):
-        """
-        Find the nearest ghost.
-        """
-        my_position = game_state.get_agent_position(self.index)
-        enemies = [game_state.get_agent_state(i) for i in self.get_opponents(game_state)]
-        ghosts = [a for a in enemies if not a.is_pacman and a.get_position() is not None]
-        if ghosts:
-            distances = [(self.get_maze_distance(my_position, ghost.get_position()), ghost) for ghost in ghosts]
-            return min(distances)[1]
-        return None
-    
-    def get_escape_route(self, game_state, ghost_position):
-        """
-        Determine the best escape route.
-        """
-        my_position = game_state.get_agent_position(self.index)
-        legal_actions = game_state.get_legal_actions(self.index)
-        best_action = None
-        max_distance = -1
-        for action in legal_actions:
-            successor = self.get_successor(game_state, action)
-            new_position = successor.get_agent_position(self.index)
-            distance = self.get_maze_distance(new_position, ghost_position)
-            if distance > max_distance:
-                max_distance = distance
-                best_action = action
-        return best_action
+
     
     def choose_action(self, game_state):
         """
         Picks among the actions with the highest Q(s,a).
         """
-        #if the agent is scared, prioritize hunting
-        if self.is_scared(game_state):
-            ghost = self.get_nearest_ghost(game_state)
-            if ghost:
-                escape_route = self.get_escape_route(game_state, ghost.get_position())
-                if escape_route:
-                    return escape_route
         
         #get companion positions
         companions = [game_state.get_agent_state(i) for i in self.get_team(game_state) if i != self.index]
