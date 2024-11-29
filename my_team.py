@@ -35,21 +35,17 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
     """
     A reflex agent that can switch between offensive and defensive modes.
     """
-    FOOD_THRESHOLD = 4  #threshold for the number of food points before returning to base
+    FOOD_THRESHOLD = 6  #threshold for the number of food points before returning to base
 
     def register_initial_state(self, game_state):
         self.start = game_state.get_agent_position(self.index)
         self.food_collected = 0  #initialize food collected counter
         CaptureAgent.register_initial_state(self, game_state)
     
-
-
-    
     def choose_action(self, game_state):
         """
         Picks among the actions with the highest Q(s,a).
         """
-        
         #get companion positions
         companions = [game_state.get_agent_state(i) for i in self.get_team(game_state) if i != self.index]
         companion_positions = [a.get_position() for a in companions if a.get_position() is not None]
@@ -57,7 +53,7 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
         actions = game_state.get_legal_actions(self.index)
         enemies = [game_state.get_agent_state(i) for i in self.get_opponents(game_state)]
         invaders = [a for a in enemies if a.is_pacman and a.get_position() is not None]
-
+        
         #evaluate all actions and choose the best one
         values = [self.evaluate(game_state, a) for a in actions]
         max_value = max(values)
@@ -111,7 +107,9 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
         agent_state = game_state.get_agent_state(self.index)
         #if there are only a few food left or the threshold is met, head back to start 
         food_left = len(self.get_food(game_state).as_list())
-        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD:
+        my_pos = successor.get_agent_state(self.index).get_position()
+        min_distance = min([self.get_maze_distance(my_pos, food) for food in self.get_food(game_state).as_list()])
+        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD and not min_distance <= 3:
             best_dist = 9999
             best_action = None
             for action in actions:
@@ -708,7 +706,9 @@ class DefensiveReflexAgent(CaptureAgent): #not used, but it was a try
         else:
             nearest_ghost_distance = float('inf')
         agent_state = game_state.get_agent_state(self.index)
-        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD or (len(ghosts) > 0 and nearest_ghost_distance <= ghost_distance_threshold) and not agent_state.is_pacman:
+        my_pos = successor.get_agent_state(self.index).get_position()
+        min_distance = min([self.get_maze_distance(my_pos, food) for food in self.get_food(game_state).as_list()])
+        if food_left <= 2 or self.food_collected >= self.FOOD_THRESHOLD or (len(ghosts) > 0 and nearest_ghost_distance <= ghost_distance_threshold) and not agent_state.is_pacman and not min_distance <= 3:
             print("run away")
             best_dist = 9999
             best_action = None
@@ -910,6 +910,7 @@ class DefensiveReflexAgent(CaptureAgent): #not used, but it was a try
         reverse = 0
         ghostdanger = 0
         hunt_scared_enemy = 0
+        
         if len(invaders)>0:
             print("enemies found")
             num_invaders = -1000
