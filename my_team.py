@@ -35,21 +35,17 @@ class HybridReflexAgent1(CaptureAgent):  #RedOne, more offensive one
     """
     A reflex agent that can switch between offensive and defensive modes.
     """
-    FOOD_THRESHOLD = 4  #threshold for the number of food points before returning to base
+    FOOD_THRESHOLD = 3  #threshold for the number of food points before returning to base
 
     def register_initial_state(self, game_state):
         self.start = game_state.get_agent_position(self.index)
         self.food_collected = 0  #initialize food collected counter
         CaptureAgent.register_initial_state(self, game_state)
     
-
-
-    
     def choose_action(self, game_state):
         """
         Picks among the actions with the highest Q(s,a).
         """
-        
         #get companion positions
         companions = [game_state.get_agent_state(i) for i in self.get_team(game_state) if i != self.index]
         companion_positions = [a.get_position() for a in companions if a.get_position() is not None]
